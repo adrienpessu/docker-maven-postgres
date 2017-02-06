@@ -5,7 +5,7 @@
 # DESCRIPTION      : A container with maven and postgres to execute Bdd tests
 # TO_BUILD         : docker build --pull=true --no-cache --rm -t docker.keendo.org/maven-postgres:master . && docker tag docker.keendo.org/maven-postgres:master docker.keendo.org/maven-postgres:1.0 && docker tag docker.keendo.org/maven-postgres:1.0 docker.keendo.org/maven-postgres:latest
 # TO_SHIP          : docker push docker.keendo.org/maven-postgres:master && docker push docker.keendo.org/maven-postgres:1.0 && docker push docker.keendo.org/maven-postgres:latest
-# TO_RUN           : docker run -d -p 5432:5432 --name maven-postgres docker.keendo.org/maven-postgres:master
+# TO_RUN           : docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=keendoo -e POSTGRES_USER=keendoo -e POSTGRES_DB=keendoo -e POSTGRES_DB_SCHEMA=keendoo --name maven-postgres docker.keendo.org/maven-postgres:master
 ##
 
 
@@ -125,4 +125,4 @@ RUN chmod +x /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
 EXPOSE 5432
-CMD ["postgres"]
+CMD ["pg_ctlcluster", "$PG_MAJOR", "main", "start"]
