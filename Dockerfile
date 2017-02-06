@@ -3,9 +3,8 @@
 # VERSION          : 1.0
 # DOCKER-VERSION   : 1.12
 # DESCRIPTION      : A container with maven and postgres to execute Bdd tests
-# TO_BUILD         : docker build --pull=true --no-cache --rm -t docker.keendo.org/maven-postgres:master . && docker tag docker.keendo.org/maven-postgres:master docker.keendo.org/maven-postgres:1.0 && docker tag docker.keendo.org/maven-postgres:1.0 docker.keendo.org/maven-postgres:latest
-# TO_SHIP          : docker push docker.keendo.org/maven-postgres:master && docker push docker.keendo.org/maven-postgres:1.0 && docker push docker.keendo.org/maven-postgres:latest
-# TO_RUN           : docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=keendoo -e POSTGRES_USER=keendoo -e POSTGRES_DB=keendoo -e POSTGRES_DB_SCHEMA=keendoo --name maven-postgres docker.keendo.org/maven-postgres:master
+# TO_BUILD         : docker build --pull=true --no-cache --rm -t adrienpessu/docker-maven-postgres:master . && docker tag adrienpessu/docker-maven-postgres:master adrienpessu/docker-maven-postgres:1.0 && docker tag adrienpessu/docker-maven-postgres:1.0 adrienpessu/docker-maven-postgres:latest
+# TO_RUN           : docker run -it --volume=/Users/adrien/workspaces/kconnect/app-service:/localDebugRepo --workdir="/localDebugRepo" --memory=4g --entrypoint=/bin/bash adrienpessu/docker-maven-postgres
 ##
 
 
