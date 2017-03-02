@@ -3,7 +3,7 @@
 # VERSION          : 1.0
 # DOCKER-VERSION   : 1.12
 # DESCRIPTION      : A container with maven and postgres to execute Bdd tests
-# TO_BUILD         : docker build --pull=true --no-cache --rm -t adrienpessu/docker-maven-postgres:master . && docker tag adrienpessu/docker-maven-postgres:master adrienpessu/docker-maven-postgres:1.0 && docker tag adrienpessu/docker-maven-postgres:1.0 adrienpessu/docker-maven-postgres:latest
+# TO_BUILD         : docker build --pull=true --no-cache --rm -t adrienpessu/docker-maven-postgres:master . && docker tag adrienpessu/docker-maven-postgres:master adrienpessu/docker-maven-postgres:1.1 && docker tag adrienpessu/docker-maven-postgres:1.1 adrienpessu/docker-maven-postgres:latest
 # TO_RUN           : docker run -it --volume=/Users/adrien/workspaces/kconnect/app-service:/localDebugRepo --workdir="/localDebugRepo" --memory=4g --entrypoint=/bin/bash adrienpessu/docker-maven-postgres
 ##
 
@@ -20,7 +20,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update
 
 # install wget
-RUN apt-get install -y wget
+RUN apt-get install -y wget curl
 
 # get maven 3.2.2
 RUN wget --no-verbose -O /tmp/apache-maven-3.2.2.tar.gz http://archive.apache.org/dist/maven/maven-3/3.2.2/binaries/apache-maven-3.2.2-bin.tar.gz
@@ -66,7 +66,7 @@ RUN groupadd -r postgres --gid=999 && useradd -r -g postgres --uid=999 postgres
 # grab gosu for easy step-down from root
 ENV GOSU_VERSION 1.7
 RUN set -x \
-	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && rm -rf /var/lib/apt/lists/* \
+	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates wget unzip && rm -rf /var/lib/apt/lists/* \
 	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
 	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
 	&& export GNUPGHOME="$(mktemp -d)" \
@@ -74,8 +74,7 @@ RUN set -x \
 	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
 	&& rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
 	&& chmod +x /usr/local/bin/gosu \
-	&& gosu nobody true \
-	&& apt-get purge -y --auto-remove ca-certificates wget
+	&& gosu nobody true
 
 # make the "en_US.UTF-8" locale so postgres will be utf-8 enabled by default
 RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* \
@@ -102,8 +101,8 @@ RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' $PG_MAJ
 
 RUN apt-get update \
    && apt-get install -y \
-		postgresql-$PG_MAJOR=$PG_VERSION \
-		postgresql-contrib-$PG_MAJOR=$PG_VERSION \
+		postgresql-$PG_MAJOR \
+		postgresql-contrib-$PG_MAJOR \
 	&& rm -rf /var/lib/apt/lists/*
 
 # make the sample config easier to munge (and "correct by default")
@@ -117,6 +116,14 @@ ENV PATH /usr/lib/postgresql/$PG_MAJOR/bin:$PATH
 ENV PGDATA /var/lib/postgresql/data
 RUN mkdir -p "$PGDATA" && chown -R postgres:postgres "$PGDATA" && chmod 777 "$PGDATA" # this 777 will be replaced by 700 at runtime (allows semi-arbitrary "--user" values)
 VOLUME /var/lib/postgresql/data
+
+
+#RUN wget -O /tmp/sonar-scanner-2.8.zip "https://sonarsource.bintray.com/Distribution/sonar-scanner-cli/sonar-scanner-2.8.zip" \
+#    && unzip /tmp/sonar-scanner-2.8.zip -d /etc/lib/ \
+#    && rm /tmp/sonar-scanner-2.8.zip \
+#    && ln -s /etc/lib/sonar-scanner-2.8//bin/sonar-scanner /usr/local/bin/sonar-scanner
+
+RUN apt-get purge -y --auto-remove ca-certificates wget
 
 COPY docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh
