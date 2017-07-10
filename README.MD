@@ -1,6 +1,10 @@
 # docker-maven-postgres
 
 Simple docker image to execute integration test or BDD in your favorite CI
+This image is deployed on the [docker hub](https://hub.docker.com/r/adrienpessu/docker-maven-postgres/)
+
+Edit :
+The image was created before the feature ["service"](https://confluence.atlassian.com/bitbucket/use-services-and-databases-in-bitbucket-pipelines-874786688.html) of BitBucket pipeline 
 
 ## Bitbucket pipeline
 
